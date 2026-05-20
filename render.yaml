@@ -1,0 +1,50 @@
+# render.yaml — Blueprint pour déploiement client (image Docker privée)
+#
+# Usage côté client :
+#   1. Forker ce fichier dans un repo (ou copier-coller dans la Blueprint Render)
+#   2. Dans Render → Account Settings → Registry Credentials → Add → GitHub Container Registry
+#      - Username : eliesse (ou le nom GitHub du fournisseur)
+#      - Password : token PAT read:packages fourni par le développeur
+#   3. New → Blueprint → coller ce render.yaml
+#   4. Renseigner les variables d'environnement (cf. section envVars)
+
+services:
+  - type: web
+    name: restaukit
+    runtime: image
+    image:
+      url: ghcr.io/eliesse13200/restaukit:latest
+      creds:
+        fromRegistryCreds:
+          name: ghcr-restaukit
+    plan: free  # passer en "starter" (7$/mo) pour always-on + disque persistant
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false  # à renseigner manuellement
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: BREVO_SMTP_LOGIN
+        sync: false
+      - key: BREVO_SMTP_PASSWORD
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: DATABASE_URL
+        value: /opt/render/project/data/booking.db
+      # Optionnel — Google Calendar
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+    disk:
+      name: restaukit-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1
