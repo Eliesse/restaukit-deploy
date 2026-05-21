@@ -3,7 +3,7 @@
 # Usage côté client :
 #   1. Forker ce fichier dans un repo (ou copier-coller dans la Blueprint Render)
 #   2. Dans Render → Account Settings → Registry Credentials → Add → GitHub Container Registry
-#      - Username : eliesse (ou le nom GitHub du fournisseur)
+#      - Username : Eliesse (propriétaire du package GHCR)
 #      - Password : token PAT read:packages fourni par le développeur
 #   3. New → Blueprint → coller ce render.yaml
 #   4. Renseigner les variables d'environnement (cf. section envVars)
@@ -13,11 +13,13 @@ services:
     name: restaukit
     runtime: image
     image:
-      url: ghcr.io/eliesse13200/restaukit:latest
+      # Figer la version : remplacer par :vX.Y.Z à chaque livraison client
+      url: ghcr.io/eliesse/restaukit:v0.1.1
       creds:
         fromRegistryCreds:
           name: ghcr-restaukit
-    plan: free  # passer en "starter" (7$/mo) pour always-on + disque persistant
+    plan: starter  # requis pour disque persistant + always-on (SQLite perdu en free)
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -35,6 +37,8 @@ services:
         sync: false
       - key: EMAIL_FROM
         sync: false
+      - key: APP_BASE_URL
+        sync: false  # ex: https://restaurant-paul.fr — utilisé par liens ICS/webcal://
       - key: DATABASE_URL
         value: /opt/render/project/data/booking.db
       # Optionnel — Google Calendar
