@@ -1,24 +1,15 @@
-# render.yaml — Blueprint pour déploiement client (image Docker privée)
-#
-# Usage côté client :
-#   1. Forker ce fichier dans un repo (ou copier-coller dans la Blueprint Render)
-#   2. Dans Render → Account Settings → Registry Credentials → Add → GitHub Container Registry
-#      - Username : Eliesse (propriétaire du package GHCR)
-#      - Password : token PAT read:packages fourni par le développeur
-#   3. New → Blueprint → coller ce render.yaml
-#   4. Renseigner les variables d'environnement (cf. section envVars)
+# render.yaml — Blueprint TEST (image publique, free plan, sans persistance)
+# ⚠️ free plan = SQLite éphémère (résas perdues au redeploy/sleep)
+# Pour prod client : repasser en starter + disk + image privée
+# (cf. deploy/render.client.yaml dans le repo source RestauKit)
 
 services:
   - type: web
     name: restaukit
     runtime: image
     image:
-      # Figer la version : remplacer par :vX.Y.Z à chaque livraison client
       url: ghcr.io/eliesse/restaukit:v0.1.1
-      creds:
-        fromRegistryCreds:
-          name: ghcr-restaukit
-    plan: starter  # requis pour disque persistant + always-on (SQLite perdu en free)
+    plan: free
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -28,7 +19,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: ADMIN_PASSWORD
-        sync: false  # à renseigner manuellement
+        sync: false
       - key: ADMIN_EMAIL
         sync: false
       - key: BREVO_SMTP_LOGIN
@@ -38,17 +29,6 @@ services:
       - key: EMAIL_FROM
         sync: false
       - key: APP_BASE_URL
-        sync: false  # ex: https://restaurant-paul.fr — utilisé par liens ICS/webcal://
+        sync: false  # ex: https://restaukit-demo.onrender.com
       - key: DATABASE_URL
-        value: /opt/render/project/data/booking.db
-      # Optionnel — Google Calendar
-      - key: GOOGLE_CLIENT_ID
-        sync: false
-      - key: GOOGLE_CLIENT_SECRET
-        sync: false
-      - key: GOOGLE_REDIRECT_URI
-        sync: false
-    disk:
-      name: restaukit-data
-      mountPath: /opt/render/project/data
-      sizeGB: 1
+        value: /tmp/booking.db
