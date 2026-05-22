@@ -8,7 +8,7 @@ services:
     name: restaukit
     runtime: image
     image:
-      url: ghcr.io/eliesse/restaukit:v0.1.4
+      url: ghcr.io/eliesse/restaukit:v0.1.6
     plan: free
     healthCheckPath: /api/health
     envVars:
@@ -22,6 +22,10 @@ services:
         sync: false
       - key: ADMIN_EMAIL
         sync: false
+      # SMTP bloqué sur Render free -> utiliser l'API HTTP Brevo (port 443)
+      - key: BREVO_API_KEY
+        sync: false
+      # Fallback SMTP (ignoré si BREVO_API_KEY défini)
       - key: BREVO_SMTP_LOGIN
         sync: false
       - key: BREVO_SMTP_PASSWORD
