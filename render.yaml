@@ -1,14 +1,14 @@
 # render.yaml — Blueprint TEST (image publique, free plan, sans persistance)
 # ⚠️ free plan = SQLite éphémère (résas perdues au redeploy/sleep)
-# Pour prod client : repasser en starter + disk + image privée
-# (cf. deploy/render.client.yaml dans le repo source RestauKit)
+# Pour prod client : voir deploy/render.client.yaml dans le repo source RestauKit
+# (starter $7/mo + disque + image privée + creds GHCR)
 
 services:
   - type: web
     name: restaukit
     runtime: image
     image:
-      url: ghcr.io/eliesse/restaukit:v0.1.1
+      url: ghcr.io/eliesse/restaukit:v0.1.2
     plan: free
     healthCheckPath: /api/health
     envVars:
